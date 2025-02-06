@@ -45,7 +45,7 @@ workflow {
         ch_reads = Channel.fromPath( params.input_csv ).splitCsv( header:true )
                 .map { row -> [ row.biosampleName, [ row.bam, row.bam + ".bai", row.bam.replace(".bam", "_recal_data.table"), row.bam.replace(".bam", ".dedup_sentieonmetrics.txt") ], row.groups, row.isbulk ] }
     }
-        
+
     ch_reads.ifEmpty{ exit 1, "ERROR: Input csv file is empty." }
 
     if ( params.mode == 'wgs' ) {
