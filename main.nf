@@ -43,8 +43,17 @@ workflow {
                 .map { row -> [ row.biosampleName, [ row.read1, row.read2 ], row.groups, row.isbulk ] }
     } else {
         ch_reads = Channel.fromPath( params.input_csv ).splitCsv( header:true )
-                .map { row -> [ row.biosampleName, [ row.bam, row.bam + ".bai", row.bam.replace(".bam", "_recal_data.table"), row.bam.replace(".bam", ".dedup_sentieonmetrics.txt") ], row.groups, row.isbulk ] }
+          .map { row -> 
+            [ row.biosampleName,
+              [ file(row.bam, checkIfExists: true),
+                file(row.bam + ".bai", checkIfExists: true),
+                file(row.bam.replace(".bam", "_recal_data.table"), checkIfExists: true),
+                file(row.bam.replace(".bam", ".dedup_sentieonmetrics.txt"), checkIfExists: true) ],
+                row.groups,
+                row.isbulk ] }
     }
+
+    // ch_reads.view()
 
     ch_reads.ifEmpty{ exit 1, "ERROR: Input csv file is empty." }
 
@@ -102,7 +111,8 @@ workflow {
 
         ch_reads.map{ sample, files, groups, isbulk -> [sample, files[0], files[1]] }
         .collectFile( name: "bam_files.txt", newLine: true, sort: { it[0] }, storeDir: "${params.tmp_dir}" )
-            { it[0] + "\t" + "${params.publish_dir}_${params.timestamp}/secondary_analyses/alignment/" + new File(it[1]).getName() }
+            //{ it[0] + "\t" + "${params.publish_dir}_${params.timestamp}/secondary_analyses/alignment/" + new File(it[1]).getName() }
+            { it[0] + "\t" + "${params.publish_dir}_${params.timestamp}/secondary_analyses/alignment/" + new File(it[1].toString()).getName() }
 
         ch_bam_recaltab = ch_reads.map{ sample, files, groups, isbulk -> [sample, files[0], files[1], files[2]] }
         ch_bam_only = ch_reads.map{ sample, files, groups, isbulk -> [sample, files[0], files[1]] }
