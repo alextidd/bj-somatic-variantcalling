@@ -25,14 +25,12 @@ process SENTIEON_DRIVER_TNSCOPE_PANEL_OF_NORMAL {
 
     """
     set +u
-    # if [ \$LOCAL != "true" ]; then
-    #     . /opt/sentieon/cloud_auth.sh no-op
-    # else
-    #     export SENTIEON_LICENSE=\$SENTIEON_LICENSE_SERVER
-    #     echo \$SENTIEON_LICENSE
-    # fi
-    export SENTIEON_LICENSE=${params.sentieon_license}
-    echo \$SENTIEON_LICENSE
+    if [ \$LOCAL != "true" ]; then
+        . /opt/sentieon/cloud_auth.sh no-op
+    else
+        export SENTIEON_LICENSE=\$SENTIEON_LICENSE_SERVER
+        echo \$SENTIEON_LICENSE
+    fi
     
     sentieon driver -t  ${task.cpus} -r ${fasta_ref}/genome.fa \
              -i ${bulk_bam[0]}  -q ${bulk_recal_table} \
