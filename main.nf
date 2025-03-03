@@ -467,34 +467,34 @@ workflow {
 
 }
 
-// OnComplete
-workflow.onComplete{
-    println( "\nPipeline completed successfully.\n\n" )
-    output                              = [:]
-    output["pipeline_run_name"]         = workflow.runName
-    output["pipeline_name"]             = workflow.manifest.name
-    output["pipeline_version"]          = workflow.manifest.version
-    output["pipeline_session_id"]       = workflow.sessionId
-    output["output"]                    = [:]
-    output["output"]["bam"]             = [:]
+// // OnComplete
+// workflow.onComplete{
+//     println( "\nPipeline completed successfully.\n\n" )
+//     output                              = [:]
+//     output["pipeline_run_name"]         = workflow.runName
+//     output["pipeline_name"]             = workflow.manifest.name
+//     output["pipeline_version"]          = workflow.manifest.version
+//     output["pipeline_session_id"]       = workflow.sessionId
+//     output["output"]                    = [:]
+//     output["output"]["bam"]             = [:]
 
 
-    if ( !params.is_bam ){
-        bam_outfile = file("$params.tmp_dir/bam_files.txt")
-        bam_outfile_lines = bam_outfile.readLines()
-        for ( bam_line : bam_outfile_lines ) {
-            def (sample_name, bam_path) = bam_line.split('\t')
-            output["output"]["bam"][sample_name] = [:]
-            output["output"]["bam"][sample_name]["bam"] = bam_path
-        }
-    }
+//     if ( !params.is_bam ){
+//         bam_outfile = file("$params.tmp_dir/bam_files.txt")
+//         bam_outfile_lines = bam_outfile.readLines()
+//         for ( bam_line : bam_outfile_lines ) {
+//             def (sample_name, bam_path) = bam_line.split('\t')
+//             output["output"]["bam"][sample_name] = [:]
+//             output["output"]["bam"][sample_name]["bam"] = bam_path
+//         }
+//     }
     
-    def output_json = JsonOutput.toJson(output)
-    def output_json_pretty = JsonOutput.prettyPrint(output_json)
-    File outputfile = new File("$params.tmp_dir/output.json")
-    outputfile.write(output_json_pretty)
-    println(output_json_pretty)
-}
+//     def output_json = JsonOutput.toJson(output)
+//     def output_json_pretty = JsonOutput.prettyPrint(output_json)
+//     File outputfile = new File("$params.tmp_dir/output.json")
+//     outputfile.write(output_json_pretty)
+//     println(output_json_pretty)
+// }
 
 // OnError
 workflow.onError{
