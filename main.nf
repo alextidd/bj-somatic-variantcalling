@@ -94,16 +94,16 @@ workflow {
         ch_bam_only = SENTIEON_ALIGNMENT.out.bam
         ch_dedup_metrics = SENTIEON_ALIGNMENT.out.dedup_metrics
 
-        // Collecting the bam files for the output
-        SENTIEON_ALIGNMENT.out.bam
-                .collectFile( name: "bam_files.txt", newLine: true, sort: { row -> row[0] }, storeDir: "${params.tmp_dir}" )
-                    { row -> row[0] + "\t" + "${params.publish_dir}_${params.timestamp}/secondary_analyses/alignment/" + row[1].getName() }
+        // // Collecting the bam files for the output
+        // SENTIEON_ALIGNMENT.out.bam
+        //         .collectFile( name: "bam_files.txt", newLine: true, sort: { row -> row[0] }, storeDir: "${params.tmp_dir}" )
+        //             { row -> row[0] + "\t" + "${params.publish_dir}_${params.timestamp}/secondary_analyses/alignment/" + row[1].getName() }
 
     } else{
 
-        ch_reads.map{ sample, files, _groups, _isbulk -> [sample, files[0], files[1]] }
-        .collectFile( name: "bam_files.txt", newLine: true, sort: { row -> row[0] }, storeDir: "${params.tmp_dir}" )
-            { row -> row[0] + "\t" + "${params.publish_dir}_${params.timestamp}/secondary_analyses/alignment/" + new File(row[1]).getName() }
+        // ch_reads.map{ sample, files, _groups, _isbulk -> [sample, files[0], files[1]] }
+        // .collectFile( name: "bam_files.txt", newLine: true, sort: { row -> row[0] }, storeDir: "${params.tmp_dir}" )
+        //     { row -> row[0] + "\t" + "${params.publish_dir}_${params.timestamp}/secondary_analyses/alignment/" + new File(row[1]).getName() }
 
         ch_bam_recaltab = ch_reads.map{ sample, files, _groups, _isbulk -> [sample, files[0], files[1], files[2]] }
         ch_bam_only = ch_reads.map{ sample, files, _groups, _isbulk -> [sample, files[0], files[1]] }
@@ -487,34 +487,34 @@ workflow {
 
 }
 
-// OnComplete
-workflow.onComplete{
-    println( "\nPipeline completed successfully.\n\n" )
-    output                              = [:]
-    output["pipeline_run_name"]         = workflow.runName
-    output["pipeline_name"]             = workflow.manifest.name
-    output["pipeline_version"]          = workflow.manifest.version
-    output["pipeline_session_id"]       = workflow.sessionId
-    output["output"]                    = [:]
-    output["output"]["bam"]             = [:]
+// // OnComplete
+// workflow.onComplete{
+//     println( "\nPipeline completed successfully.\n\n" )
+//     output                              = [:]
+//     output["pipeline_run_name"]         = workflow.runName
+//     output["pipeline_name"]             = workflow.manifest.name
+//     output["pipeline_version"]          = workflow.manifest.version
+//     output["pipeline_session_id"]       = workflow.sessionId
+//     output["output"]                    = [:]
+//     output["output"]["bam"]             = [:]
 
 
-    if ( !params.is_bam ){
-        bam_outfile = file("$params.tmp_dir/bam_files.txt")
-        bam_outfile_lines = bam_outfile.readLines()
-        for ( bam_line : bam_outfile_lines ) {
-            def (sample_name, bam_path) = bam_line.split('\t')
-            output["output"]["bam"][sample_name] = [:]
-            output["output"]["bam"][sample_name]["bam"] = bam_path
-        }
-    }
+//     if ( !params.is_bam ){
+//         bam_outfile = file("$params.tmp_dir/bam_files.txt")
+//         bam_outfile_lines = bam_outfile.readLines()
+//         for ( bam_line : bam_outfile_lines ) {
+//             def (sample_name, bam_path) = bam_line.split('\t')
+//             output["output"]["bam"][sample_name] = [:]
+//             output["output"]["bam"][sample_name]["bam"] = bam_path
+//         }
+//     }
     
-    def output_json = groovy.json.JsonOutput.toJson(output)
-    def output_json_pretty = groovy.json.JsonOutput.prettyPrint(output_json)
-    File outputfile = new File("$params.tmp_dir/output.json")
-    outputfile.write(output_json_pretty)
-    println(output_json_pretty)
-}
+//     def output_json = groovy.json.JsonOutput.toJson(output)
+//     def output_json_pretty = groovy.json.JsonOutput.prettyPrint(output_json)
+//     File outputfile = new File("$params.tmp_dir/output.json")
+//     outputfile.write(output_json_pretty)
+//     println(output_json_pretty)
+// }
 
 // OnError
 workflow.onError{
