@@ -21,7 +21,7 @@ process MERGE_PROCESSED_VCF {
     """
     echo -e "Listing files to merge ...";
     
-    find . -type f -name "*.vcf.gz" | sort > list_vcf.txt
+    find . -type l -name "*.vcf.gz" | sort > list_vcf.txt
     cat list_vcf.txt;
     echo -e "Merging VCF files ...";
     bcftools merge --threads ${task.cpus} -m none --file-list list_vcf.txt -g ${reference}/genome.fa | bcftools norm --threads ${task.cpus} -m -any --check-ref s -f ${reference}/genome.fa -Oz -o merged_group_${group}.vcf.gz
